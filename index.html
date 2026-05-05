@@ -1,0 +1,2876 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Nimbus Turni">
+<meta name="theme-color" content="#0A0A0C">
+<title>Nimbus — Turni Personale</title>
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%230A0A0C'/%3E%3Cpath d='M48.5 50H16C8.27 50 2 43.73 2 36C2 28.27 8.27 22 16 22C16.83 22 17.65 22.07 18.45 22.21C20.66 17.32 25.59 14 31.3 14C38.94 14 45.16 20.05 45.49 27.6C45.51 28.05 45.84 28.42 46.29 28.48C53.07 29.36 58.3 35.16 58.3 42.15C58.3 46.49 56.05 50 48.5 50Z' stroke='%231E90FF' stroke-width='3' fill='none'/%3E%3C/svg%3E">
+<style>
+  /* ============ RESET + TOKENS ============ */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --nimbus-blue: #1E90FF;
+    --nimbus-blue-deep: #0B5FA8;
+    --nimbus-magenta: #E63CC9;
+    --bg: #0A0A0C;
+    --bg-elev: #131318;
+    --bg-elev-2: #1B1B22;
+    --bg-elev-3: #232330;
+    --border: #2A2A33;
+    --border-soft: #1F1F27;
+    --text: #F2F2F5;
+    --text-dim: #9A9AA8;
+    --text-faint: #5A5A66;
+    --danger: #E5484D;
+    --success: #30A46C;
+    --warning: #F5A524;
+    --info: #6E56CF;
+
+    --radius: 10px;
+    --radius-sm: 6px;
+    --radius-lg: 16px;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.4);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.5);
+    --shadow-lg: 0 12px 40px rgba(0,0,0,0.6);
+
+    --font-display: 'Space Grotesk', 'Helvetica Neue', sans-serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-left: env(safe-area-inset-left, 0px);
+    --safe-right: env(safe-area-inset-right, 0px);
+
+    --tap-min: 44px;
+  }
+
+  html {
+    font-size: 15px;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    min-height: 100dvh;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    background-image:
+      radial-gradient(ellipse at top right, rgba(30,144,255,0.06), transparent 50%),
+      radial-gradient(ellipse at bottom left, rgba(230,60,201,0.04), transparent 50%);
+    overscroll-behavior-y: none;
+    padding-left: var(--safe-left);
+    padding-right: var(--safe-right);
+  }
+
+  button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+  input, select, textarea {
+    font-family: inherit;
+    font-size: inherit;
+    -webkit-tap-highlight-color: transparent;
+  }
+  input, textarea { font-size: 16px; } /* Prevents iOS zoom */
+  @media (min-width: 700px) {
+    input, textarea { font-size: 14px; }
+  }
+
+  /* ============ HEADER ============ */
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,10,12,0.92);
+    border-bottom: 1px solid var(--border-soft);
+    padding-top: var(--safe-top);
+  }
+  @supports ((backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px))) {
+    @media (min-width: 700px) {
+      .header {
+        background: rgba(10,10,12,0.85);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+      }
+    }
+  }
+  .header-inner {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 18px 28px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand-mark {
+    width: 36px; height: 36px;
+    display: grid;
+    place-items: center;
+    color: var(--nimbus-blue);
+    filter: drop-shadow(0 0 12px rgba(30,144,255,0.4));
+    flex-shrink: 0;
+  }
+  .brand-mark svg { width: 100%; height: 100%; }
+  .brand-text { display: flex; flex-direction: column; line-height: 1.1; }
+  .brand-name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.01em;
+  }
+  .brand-sub {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .view-switcher {
+    display: flex;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 3px;
+  }
+  .view-switcher button {
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-dim);
+    border-radius: 4px;
+    transition: all 0.15s;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    min-height: 36px;
+  }
+  .view-switcher button.active { background: var(--nimbus-blue); color: white; }
+  .view-switcher button:hover:not(.active) { color: var(--text); }
+
+  .week-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 4px;
+  }
+  .week-control button.nav-btn {
+    width: 36px; height: 36px;
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius-sm);
+    color: var(--text-dim);
+    transition: all 0.15s;
+  }
+  .week-control button.nav-btn:hover { background: var(--bg-elev-2); color: var(--text); }
+  .week-control button.nav-btn:active { background: var(--bg-elev-3); }
+  .week-display {
+    padding: 0 12px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    min-width: 180px;
+    text-align: center;
+  }
+  .week-display .week-num {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    display: block;
+  }
+  .week-display .week-range { font-family: var(--font-display); font-weight: 600; }
+
+  .actions { display: flex; gap: 8px; }
+  .btn {
+    height: 38px;
+    padding: 0 14px;
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+    font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s;
+    border: 1px solid transparent;
+    white-space: nowrap;
+  }
+  .btn-ghost {
+    background: var(--bg-elev);
+    border-color: var(--border);
+    color: var(--text-dim);
+  }
+  .btn-ghost:hover { color: var(--text); border-color: #3A3A45; }
+  .btn-ghost:active { background: var(--bg-elev-2); }
+  .btn-primary {
+    background: var(--nimbus-blue);
+    color: white;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.08) inset;
+  }
+  .btn-primary:hover { background: #2D9DFF; }
+  .btn-primary:active { background: var(--nimbus-blue-deep); }
+  .btn-icon { width: 38px; padding: 0; justify-content: center; }
+  .btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+  /* Mobile menu (kebab) - hidden on desktop */
+  .menu-trigger { display: none; }
+  .menu-sheet { display: none; }
+
+  .main {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 28px;
+    padding-bottom: calc(28px + var(--safe-bottom));
+  }
+
+  /* ============ DAY TABS ============ */
+  .day-tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--bg-elev);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius);
+    padding: 4px;
+    margin-bottom: 24px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+  }
+  .day-tabs::-webkit-scrollbar { display: none; }
+  .day-tab {
+    flex: 1;
+    min-width: 130px;
+    padding: 10px 16px;
+    border-radius: var(--radius-sm);
+    text-align: center;
+    transition: all 0.15s;
+    color: var(--text-dim);
+    position: relative;
+    scroll-snap-align: center;
+    min-height: var(--tap-min);
+  }
+  .day-tab:hover:not(.active) { background: var(--bg-elev-2); color: var(--text); }
+  .day-tab.active { background: var(--nimbus-blue); color: white; }
+  .day-tab.disabled { opacity: 0.35; }
+  .day-tab.disabled:hover { background: transparent; color: var(--text-dim); }
+  .day-name {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    display: block;
+  }
+  .day-date { font-size: 11px; opacity: 0.7; font-variant-numeric: tabular-nums; }
+  .day-tab.active .day-date { opacity: 0.9; }
+  .day-count {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    background: rgba(0,0,0,0.3);
+    color: inherit;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .day-tab.active .day-count { background: rgba(255,255,255,0.2); }
+
+  /* ============ DAY HEADER ============ */
+  .day-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .day-title {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .day-title .day-title-sub { color: var(--text-dim); font-weight: 400; margin-left: 12px; }
+  .day-meta { display: flex; gap: 20px; align-items: center; }
+  .meta-stat { display: flex; flex-direction: column; align-items: flex-end; }
+  .meta-stat-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .meta-stat-value {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 20px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .day-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    color: var(--text-dim);
+    transition: all 0.15s;
+    min-height: var(--tap-min);
+  }
+  .day-toggle:hover { color: var(--text); }
+  .day-toggle.closed { color: var(--warning); border-color: rgba(245,165,36,0.3); }
+  .toggle-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); }
+  .day-toggle.closed .toggle-dot { background: var(--warning); }
+
+  /* ============ ROLES GRID ============ */
+  .roles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 16px;
+  }
+
+  .role-card {
+    background: var(--bg-elev);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .role-card:hover { border-color: var(--border); }
+
+  .role-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border-soft);
+    background: linear-gradient(180deg, rgba(30,144,255,0.06), transparent);
+  }
+  .role-name {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text);
+  }
+  .role-name::before {
+    content: '';
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--nimbus-blue);
+    margin-right: 10px;
+    vertical-align: middle;
+    box-shadow: 0 0 8px var(--nimbus-blue);
+  }
+  .role-count {
+    font-size: 12px;
+    color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+    background: var(--bg-elev-2);
+    padding: 3px 8px;
+    border-radius: 10px;
+  }
+
+  .role-slots { padding: 8px; display: flex; flex-direction: column; gap: 4px; }
+
+  .slot {
+    display: grid;
+    grid-template-columns: 24px 1fr auto;
+    align-items: start;
+    gap: 8px;
+    padding: 8px;
+    border-radius: var(--radius-sm);
+    transition: background 0.15s;
+  }
+  .slot:hover { background: var(--bg-elev-2); }
+  .slot-num {
+    width: 24px; height: 24px;
+    display: grid;
+    place-items: center;
+    background: var(--bg-elev-2);
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-faint);
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+    margin-top: 8px;
+  }
+  .slot.filled .slot-num { background: rgba(30,144,255,0.15); color: var(--nimbus-blue); }
+  .slot-main { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .slot-input {
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    padding: 8px;
+    color: var(--text);
+    transition: all 0.15s;
+    width: 100%;
+    min-height: var(--tap-min);
+  }
+  .slot-input::placeholder { color: var(--text-faint); }
+  .slot-input:hover { border-color: var(--border); }
+  .slot-input:focus { outline: none; border-color: var(--nimbus-blue); background: var(--bg); }
+
+  .slot-meta {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 0 4px;
+  }
+
+  .status-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 10px;
+    background: var(--bg);
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: all 0.15s;
+    min-height: 30px;
+  }
+  .status-trigger:hover { border-color: #3A3A45; }
+  .status-trigger:active { background: var(--bg-elev-2); }
+  .status-trigger .caret {
+    width: 8px; height: 8px;
+    opacity: 0.5;
+  }
+  .status-trigger.s-confirmed { color: var(--success); border-color: rgba(48,164,108,0.4); background-color: rgba(48,164,108,0.08); }
+  .status-trigger.s-pending   { color: var(--warning); border-color: rgba(245,165,36,0.4); background-color: rgba(245,165,36,0.08); }
+  .status-trigger.s-cancelled { color: var(--danger); border-color: rgba(229,72,77,0.4); background-color: rgba(229,72,77,0.08); }
+  .status-trigger.s-substitute{ color: var(--info); border-color: rgba(110,86,207,0.4); background-color: rgba(110,86,207,0.08); }
+
+  .check-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 9px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+    line-height: 1.2;
+    min-height: 30px;
+  }
+  .check-pill:hover { border-color: #3A3A45; color: var(--text-dim); }
+  .check-pill:active { background: var(--bg-elev-2); }
+  .check-pill.on {
+    background: rgba(48,164,108,0.1);
+    border-color: rgba(48,164,108,0.4);
+    color: var(--success);
+  }
+  .check-pill .check-mark {
+    width: 12px; height: 12px;
+    border-radius: 2px;
+    border: 1px solid currentColor;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .check-pill.on .check-mark { background: currentColor; }
+  .check-pill.on .check-mark::after {
+    content: '';
+    position: absolute;
+    width: 6px; height: 3px;
+    border-left: 1.5px solid var(--bg-elev);
+    border-bottom: 1.5px solid var(--bg-elev);
+    transform: rotate(-45deg) translateY(-1px);
+    top: 3px; left: 2px;
+  }
+
+  .slot-remove {
+    width: 32px; height: 32px;
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius-sm);
+    color: var(--text-faint);
+    opacity: 0;
+    transition: all 0.15s;
+    flex-shrink: 0;
+    align-self: flex-start;
+    margin-top: 4px;
+  }
+  .slot:hover .slot-remove { opacity: 1; }
+  .slot-remove:hover { color: var(--danger); background: rgba(229,72,77,0.1); }
+  .slot-remove:active { background: rgba(229,72,77,0.2); }
+
+  .role-footer {
+    padding: 8px;
+    border-top: 1px solid var(--border-soft);
+    display: flex;
+    gap: 6px;
+  }
+  .add-slot {
+    flex: 1;
+    height: var(--tap-min);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border-radius: var(--radius-sm);
+    color: var(--text-dim);
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px dashed var(--border);
+    transition: all 0.15s;
+  }
+  .add-slot:hover {
+    color: var(--nimbus-blue);
+    border-color: var(--nimbus-blue);
+    background: rgba(30,144,255,0.05);
+  }
+  .add-slot:active { background: rgba(30,144,255,0.1); }
+
+  .day-closed-state {
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--text-dim);
+  }
+  .day-closed-state svg { width: 48px; height: 48px; margin-bottom: 16px; opacity: 0.4; }
+  .day-closed-state h3 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  /* ============ WEEK VIEW ============ */
+  .week-view-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .week-view-title {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .week-view-title .sub {
+    color: var(--text-dim);
+    font-weight: 400;
+    margin-left: 12px;
+    font-size: 18px;
+  }
+
+  .week-summary-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .summary-card {
+    background: var(--bg-elev);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+  }
+  .summary-card-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+  }
+  .summary-card-value {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 26px;
+    font-variant-numeric: tabular-nums;
+  }
+  .summary-card-value .sub { color: var(--text-faint); font-weight: 400; font-size: 16px; }
+  .summary-card.alert { border-color: rgba(245,165,36,0.3); }
+  .summary-card.alert .summary-card-value { color: var(--warning); }
+
+  /* Week TABLE (desktop+tablet) */
+  .week-table-wrap {
+    background: var(--bg-elev);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius);
+    overflow: hidden;
+    overflow-x: auto;
+  }
+  .week-table { width: 100%; border-collapse: collapse; min-width: 900px; }
+  .week-table th {
+    background: var(--bg-elev-2);
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 12px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+  .week-table th.day-col { text-align: center; border-left: 1px solid var(--border-soft); }
+  .week-table th.day-col.closed { color: var(--text-faint); opacity: 0.5; }
+  .week-table th .col-day-name {
+    display: block;
+    color: var(--text);
+    font-family: var(--font-display);
+    font-size: 13px;
+  }
+  .week-table th .col-day-date {
+    display: block;
+    color: var(--text-dim);
+    font-size: 10px;
+    margin-top: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+  .week-table th .col-day-count {
+    display: inline-block;
+    margin-top: 4px;
+    background: rgba(30,144,255,0.15);
+    color: var(--nimbus-blue);
+    padding: 1px 6px;
+    border-radius: 8px;
+    font-size: 10px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .week-table td {
+    padding: 6px 14px;
+    border-bottom: 1px solid var(--border-soft);
+    vertical-align: top;
+    font-size: 13px;
+  }
+  .week-table td.role-cell {
+    font-family: var(--font-display);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 12px;
+    color: var(--text);
+    background: var(--bg-elev-2);
+    width: 130px;
+    border-right: 1px solid var(--border-soft);
+    vertical-align: middle;
+    padding: 12px 14px;
+  }
+  .week-table td.day-cell {
+    border-left: 1px solid var(--border-soft);
+    min-width: 130px;
+  }
+  .week-table td.day-cell.closed {
+    background: repeating-linear-gradient(
+      45deg, transparent, transparent 6px,
+      rgba(255,255,255,0.02) 6px, rgba(255,255,255,0.02) 12px
+    );
+    text-align: center;
+    color: var(--text-faint);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 500;
+    vertical-align: middle;
+  }
+  .week-table tr:last-child td { border-bottom: none; }
+
+  .week-name {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 0;
+    font-size: 13px;
+    color: var(--text);
+  }
+  .week-name .name-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .week-name .name-dot.s-confirmed { background: var(--success); }
+  .week-name .name-dot.s-pending   { background: var(--warning); }
+  .week-name .name-dot.s-cancelled { background: var(--danger); }
+  .week-name .name-dot.s-substitute{ background: var(--info); }
+  .week-name.s-cancelled { color: var(--text-faint); text-decoration: line-through; }
+  .week-name .flags {
+    margin-left: auto;
+    display: inline-flex;
+    gap: 3px;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  .week-name .flag { padding: 1px 4px; border-radius: 3px; border: 1px solid; }
+  .week-name .flag.missing-doc {
+    color: var(--danger);
+    border-color: rgba(229,72,77,0.5);
+    background: rgba(229,72,77,0.08);
+  }
+  .week-name .flag.missing-hire {
+    color: var(--warning);
+    border-color: rgba(245,165,36,0.5);
+    background: rgba(245,165,36,0.08);
+  }
+
+  /* Week stack view (mobile) */
+  .week-stack { display: none; }
+  .week-stack-day {
+    background: var(--bg-elev);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius);
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .week-stack-day.closed { opacity: 0.55; }
+  .week-stack-day-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    background: linear-gradient(180deg, rgba(30,144,255,0.06), transparent);
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .week-stack-day-header.closed-header { background: transparent; }
+  .week-stack-day-name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 16px;
+  }
+  .week-stack-day-name .date {
+    color: var(--text-dim);
+    font-weight: 400;
+    margin-left: 8px;
+    font-size: 13px;
+  }
+  .week-stack-day-stats {
+    font-size: 12px;
+    color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+  }
+  .week-stack-day-stats .closed-tag {
+    color: var(--warning);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .week-stack-roles { padding: 4px 0; }
+  .week-stack-role {
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    gap: 12px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border-soft);
+    align-items: start;
+  }
+  .week-stack-role:last-child { border-bottom: none; }
+  .week-stack-role-name {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-dim);
+    padding-top: 3px;
+  }
+  .week-stack-role-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+  .week-stack-empty {
+    color: var(--text-faint);
+    font-size: 13px;
+    font-style: italic;
+  }
+  .week-stack-day-empty {
+    padding: 16px;
+    color: var(--text-faint);
+    font-size: 13px;
+    text-align: center;
+    font-style: italic;
+  }
+
+  .legend {
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+  .legend-item { display: inline-flex; align-items: center; gap: 6px; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .legend-flag {
+    padding: 1px 5px;
+    border-radius: 3px;
+    border: 1px solid;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  /* ============ MODAL ============ */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    padding-top: calc(20px + var(--safe-top));
+    padding-bottom: calc(20px + var(--safe-bottom));
+  }
+  @supports ((backdrop-filter: blur(8px)) or (-webkit-backdrop-filter: blur(8px))) {
+    @media (min-width: 700px) {
+      .modal-overlay { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+    }
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    width: 100%;
+    max-width: 480px;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .modal-header {
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--border-soft);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .modal-title { font-family: var(--font-display); font-weight: 600; font-size: 16px; }
+  .modal-body { padding: 20px; overflow-y: auto; }
+  .modal-footer {
+    padding: 14px 20px;
+    border-top: 1px solid var(--border-soft);
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+  }
+  .field { margin-bottom: 14px; }
+  .field-label {
+    display: block;
+    font-size: 12px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+  .field-input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    color: var(--text);
+  }
+  .field-input:focus { outline: none; border-color: var(--nimbus-blue); }
+  .field-help { font-size: 12px; color: var(--text-faint); margin-top: 6px; }
+  textarea.field-input {
+    resize: vertical;
+    min-height: 100px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+
+  /* ============ BOTTOM SHEET (status, mobile menu) ============ */
+  .sheet-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1500;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .sheet-overlay.open { opacity: 1; pointer-events: auto; }
+  .sheet {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg-elev);
+    border-top-left-radius: var(--radius-lg);
+    border-top-right-radius: var(--radius-lg);
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+    z-index: 1600;
+    transform: translateY(100%);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    padding-bottom: var(--safe-bottom);
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .sheet.open { transform: translateY(0); }
+  .sheet-handle {
+    width: 36px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 10px auto 4px;
+    flex-shrink: 0;
+  }
+  .sheet-header {
+    padding: 12px 20px 16px;
+    border-bottom: 1px solid var(--border-soft);
+    flex-shrink: 0;
+  }
+  .sheet-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 16px;
+    text-align: center;
+  }
+  .sheet-body {
+    padding: 8px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .sheet-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    border-radius: var(--radius);
+    width: 100%;
+    text-align: left;
+    transition: background 0.15s;
+    color: var(--text);
+    font-size: 15px;
+  }
+  .sheet-option:active { background: var(--bg-elev-2); }
+  .sheet-option .opt-dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .sheet-option.s-confirmed .opt-dot { background: var(--success); }
+  .sheet-option.s-pending .opt-dot   { background: var(--warning); }
+  .sheet-option.s-substitute .opt-dot{ background: var(--info); }
+  .sheet-option.s-cancelled .opt-dot { background: var(--danger); }
+  .sheet-option.selected { background: var(--bg-elev-2); }
+  .sheet-option.selected::after {
+    content: '';
+    width: 16px; height: 16px;
+    margin-left: auto;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231E90FF' stroke-width='3'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+  .sheet-option-icon {
+    width: 24px; height: 24px;
+    color: var(--text-dim);
+    flex-shrink: 0;
+  }
+
+  /* ============ SYNC INDICATOR ============ */
+  .sync-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 0 12px;
+    height: 38px;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+    transition: all 0.2s;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .sync-status:hover { color: var(--text); border-color: #3A3A45; }
+  .sync-status:active { background: var(--bg-elev-2); }
+  .sync-status .sync-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--text-faint);
+    flex-shrink: 0;
+  }
+  .sync-status.synced { color: var(--success); border-color: rgba(48,164,108,0.3); background: rgba(48,164,108,0.06); }
+  .sync-status.synced .sync-dot { background: var(--success); }
+  .sync-status.dirty { color: var(--warning); border-color: rgba(245,165,36,0.4); background: rgba(245,165,36,0.06); }
+  .sync-status.dirty .sync-dot {
+    background: var(--warning);
+    animation: sync-pulse 2s ease-in-out infinite;
+  }
+  .sync-status.syncing { color: var(--info); border-color: rgba(110,86,207,0.3); }
+  .sync-status.syncing .sync-dot {
+    background: var(--info);
+    animation: sync-pulse 0.8s ease-in-out infinite;
+  }
+  .sync-status.error { color: var(--danger); border-color: rgba(229,72,77,0.4); background: rgba(229,72,77,0.06); }
+  .sync-status.error .sync-dot { background: var(--danger); }
+  .sync-status.offline { color: var(--text-faint); }
+  @keyframes sync-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
+  }
+  .sync-status .sync-label-mobile { display: none; }
+
+  .sync-info {
+    background: var(--bg);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin-bottom: 16px;
+  }
+  .sync-info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+    font-size: 13px;
+    gap: 12px;
+  }
+  .sync-info-label { color: var(--text-dim); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .sync-info-value { font-variant-numeric: tabular-nums; color: var(--text); text-align: right; }
+  .sync-info-value.muted { color: var(--text-faint); }
+  .sync-info-value.dirty { color: var(--warning); }
+  .sync-info-value.synced { color: var(--success); }
+  .sync-info-value.error { color: var(--danger); }
+
+  .sync-actions { display: grid; gap: 10px; }
+  .sync-action-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    text-align: left;
+    transition: all 0.15s;
+    width: 100%;
+    min-height: var(--tap-min);
+  }
+  .sync-action-btn:hover { border-color: #3A3A45; background: var(--bg-elev-2); }
+  .sync-action-btn:active { background: var(--bg-elev-3); }
+  .sync-action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .sync-action-btn.primary {
+    background: rgba(30,144,255,0.08);
+    border-color: rgba(30,144,255,0.3);
+  }
+  .sync-action-btn.primary:hover { background: rgba(30,144,255,0.12); }
+  .sync-action-btn .sa-icon {
+    width: 36px; height: 36px;
+    display: grid;
+    place-items: center;
+    background: var(--bg-elev-2);
+    border-radius: var(--radius-sm);
+    color: var(--nimbus-blue);
+    flex-shrink: 0;
+  }
+  .sync-action-btn .sa-icon svg { width: 18px; height: 18px; }
+  .sync-action-btn.primary .sa-icon { background: rgba(30,144,255,0.18); }
+  .sync-action-btn .sa-text { flex: 1; min-width: 0; }
+  .sync-action-btn .sa-title { font-size: 14px; font-weight: 500; display: block; }
+  .sync-action-btn .sa-desc { font-size: 12px; color: var(--text-dim); display: block; margin-top: 2px; }
+
+  .sync-warning {
+    padding: 12px 14px;
+    background: rgba(245,165,36,0.08);
+    border: 1px solid rgba(245,165,36,0.3);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    color: var(--warning);
+    margin-bottom: 16px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    line-height: 1.45;
+  }
+  .sync-warning svg { width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px; }
+
+  /* ============ TOAST ============ */
+  .toast {
+    position: fixed;
+    bottom: calc(24px + var(--safe-bottom));
+    left: 50%;
+    transform: translateX(-50%) translateY(120%);
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 18px;
+    font-size: 13px;
+    box-shadow: var(--shadow-lg);
+    z-index: 2000;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: calc(100% - 32px);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.success { border-color: rgba(48,164,108,0.4); }
+  .toast.error { border-color: rgba(229,72,77,0.4); }
+  .toast-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-dim); flex-shrink: 0; }
+  .toast.success .toast-dot { background: var(--success); }
+  .toast.error .toast-dot { background: var(--danger); }
+
+  /* ============ MOBILE LAYOUT ============ */
+  @media (max-width: 760px) {
+    .header-inner {
+      padding: 10px 14px;
+      gap: 10px;
+      flex-wrap: nowrap;
+    }
+    .brand { gap: 8px; min-width: 0; flex: 0 0 auto; }
+    .brand-mark { width: 30px; height: 30px; }
+    .brand-text { display: none; } /* Save space */
+
+    .view-switcher {
+      flex: 1;
+      max-width: 200px;
+    }
+    .view-switcher button {
+      flex: 1;
+      padding: 8px 6px;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+    }
+
+    .week-control {
+      order: 99;
+      width: 100%;
+      margin-left: 0;
+      padding: 3px;
+      gap: 4px;
+    }
+    .week-control button.nav-btn { width: 38px; height: 38px; }
+    .week-display {
+      flex: 1;
+      min-width: 0;
+      padding: 0 4px;
+    }
+    #today-btn { padding: 0 8px !important; height: 38px !important; }
+
+    .actions { display: none; }
+    .menu-trigger {
+      display: grid;
+      place-items: center;
+      width: 38px; height: 38px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-elev);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      flex-shrink: 0;
+      margin-left: auto;
+    }
+    .menu-trigger:active { background: var(--bg-elev-2); }
+    .menu-trigger svg { width: 18px; height: 18px; }
+
+    .main { padding: 14px; }
+
+    .day-tabs {
+      margin: 0 -14px 16px;
+      border-radius: 0;
+      border-left: none;
+      border-right: none;
+      padding: 4px 14px;
+    }
+    .day-tab {
+      min-width: 86px;
+      padding: 10px 12px;
+      flex: 0 0 auto;
+    }
+
+    .day-header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+    }
+    .day-title { font-size: 24px; }
+    .day-title .day-title-sub { display: block; margin-left: 0; font-size: 13px; margin-top: 2px; }
+    .day-meta {
+      width: 100%;
+      justify-content: space-between;
+    }
+    .day-toggle {
+      flex: 1;
+      justify-content: center;
+    }
+
+    .roles-grid { grid-template-columns: 1fr; gap: 12px; }
+
+    .slot { grid-template-columns: 24px 1fr; }
+    .slot-remove {
+      grid-column: 2;
+      justify-self: end;
+      opacity: 1;
+      width: 32px; height: 32px;
+      margin-top: 0;
+    }
+
+    .week-view-title { font-size: 24px; }
+    .week-view-title .sub { display: block; margin-left: 0; font-size: 14px; margin-top: 4px; }
+
+    .week-summary-bar {
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .summary-card { padding: 10px 12px; }
+    .summary-card-value { font-size: 22px; }
+
+    /* Hide table, show stack */
+    .week-table-wrap { display: none; }
+    .week-stack { display: block; }
+
+    .modal-overlay { padding: 12px; padding-bottom: calc(12px + var(--safe-bottom)); }
+    .modal-footer { gap: 6px; }
+    .modal-footer .btn { flex: 1; min-width: 0; justify-content: center; }
+  }
+
+  @media (max-width: 380px) {
+    .view-switcher button { font-size: 10px; padding: 8px 4px; }
+    .day-tab { min-width: 76px; padding: 10px 8px; }
+    .week-stack-role { grid-template-columns: 80px 1fr; gap: 8px; padding: 10px 12px; }
+  }
+
+  /* ============ PRINT ============ */
+  @media print {
+    @page { size: A4 landscape; margin: 10mm; }
+    body { background: white !important; color: black !important; background-image: none !important; }
+    .header, .day-tabs, .role-footer, .slot-remove, .day-toggle, .actions,
+    .week-control button, .view-switcher, .week-summary-bar, .menu-trigger,
+    .sheet-overlay, .sheet, .toast { display: none !important; }
+    .header-inner { padding: 0 !important; }
+    .brand { display: flex !important; }
+    .brand-text { display: flex !important; }
+    .brand-name, .brand-sub { color: black !important; }
+    .brand-mark { color: black !important; filter: none !important; }
+
+    .main { max-width: 100%; padding: 0; }
+    .day-content, .day-header, .week-view-header, .week-table-wrap, .week-stack, .legend { display: none !important; }
+
+    #print-container { display: block !important; }
+
+    .print-day { page-break-after: always; padding-top: 4mm; }
+    .print-day:last-child { page-break-after: auto; }
+    .print-day-header {
+      border-bottom: 2px solid black;
+      padding-bottom: 4mm;
+      margin-bottom: 5mm;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+    }
+    .print-day-title { font-family: var(--font-display); font-size: 20pt; font-weight: 700; color: black; }
+    .print-day-stats { font-size: 9pt; color: #555; }
+
+    .print-roles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5mm; }
+    .print-role { border: 1px solid #888; border-radius: 2px; page-break-inside: avoid; break-inside: avoid; }
+    .print-role-header {
+      background: #000 !important; color: white !important;
+      padding: 2.5mm 3mm;
+      font-family: var(--font-display);
+      font-size: 9pt; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      -webkit-print-color-adjust: exact; print-color-adjust: exact;
+      display: flex; justify-content: space-between;
+    }
+    .print-role-list { list-style: none; padding: 1.5mm 3mm; font-size: 9pt; }
+    .print-role-list li {
+      padding: 1mm 0;
+      border-bottom: 1px dotted #ccc;
+      display: grid;
+      grid-template-columns: 5mm 1fr auto auto auto;
+      gap: 2mm;
+      align-items: baseline;
+    }
+    .print-role-list li:last-child { border-bottom: none; }
+    .print-role-num { font-variant-numeric: tabular-nums; color: #888; font-size: 8pt; }
+    .print-role-name { font-weight: 500; }
+    .print-role-name.empty { color: #aaa; font-style: italic; font-weight: 400; }
+    .print-status {
+      font-size: 7.5pt; text-transform: uppercase; letter-spacing: 0.04em;
+      color: #555; padding: 0 3mm; border-left: 1px solid #ccc;
+    }
+    .print-flag {
+      font-size: 7pt; font-weight: 700; text-transform: uppercase;
+      padding: 0 2mm; border: 1px solid; border-radius: 2px;
+    }
+    .print-flag.missing { color: #B5290D; border-color: #B5290D; }
+
+    .print-week-header {
+      border-bottom: 2px solid black;
+      padding-bottom: 4mm; margin-bottom: 5mm;
+      display: flex; justify-content: space-between; align-items: baseline;
+    }
+    .print-week-title { font-family: var(--font-display); font-size: 18pt; font-weight: 700; color: black; }
+    .print-week-table { width: 100%; border-collapse: collapse; font-size: 8.5pt; }
+    .print-week-table th {
+      background: #000 !important; color: white !important;
+      padding: 2mm 2.5mm; text-align: left;
+      text-transform: uppercase; letter-spacing: 0.04em;
+      font-size: 8pt; font-weight: 600;
+      -webkit-print-color-adjust: exact; print-color-adjust: exact;
+      border: 1px solid #000;
+    }
+    .print-week-table th.day-col { text-align: center; }
+    .print-week-table th.day-col-closed { background: #555 !important; }
+    .print-week-table td { border: 1px solid #bbb; padding: 1.5mm 2.5mm; vertical-align: top; }
+    .print-week-table td.role-cell {
+      background: #f0f0f0 !important; font-weight: 600;
+      text-transform: uppercase; font-size: 8pt; letter-spacing: 0.04em;
+      vertical-align: middle;
+      -webkit-print-color-adjust: exact; print-color-adjust: exact;
+    }
+    .print-week-table td.closed {
+      background: repeating-linear-gradient(45deg, #f5f5f5, #f5f5f5 4px, #e8e8e8 4px, #e8e8e8 8px) !important;
+      -webkit-print-color-adjust: exact; print-color-adjust: exact;
+      text-align: center; color: #888; font-style: italic;
+      vertical-align: middle; font-size: 8pt;
+    }
+    .print-week-table .pname { display: block; padding: 0.5mm 0; }
+    .print-week-table .pname.cancelled { text-decoration: line-through; color: #999; }
+    .print-week-table .pname .pflag { font-size: 7pt; font-weight: 700; color: #B5290D; margin-left: 2mm; }
+    .print-week-legend {
+      margin-top: 4mm; font-size: 8pt; color: #555;
+      display: flex; gap: 5mm; flex-wrap: wrap;
+    }
+  }
+  #print-container { display: none; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 64 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M48.5 38H16C8.27 38 2 31.73 2 24C2 16.27 8.27 10 16 10C16.83 10 17.65 10.07 18.45 10.21C20.66 5.32 25.59 2 31.3 2C38.94 2 45.16 8.05 45.49 15.6C45.51 16.05 45.84 16.42 46.29 16.48C53.07 17.36 58.3 23.16 58.3 30.15C58.3 34.49 56.05 38 48.5 38Z" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round" fill="none"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Nimbus</span>
+        <span class="brand-sub">Turni Personale</span>
+      </div>
+    </div>
+
+    <div class="view-switcher">
+      <button id="view-day" class="active">Giorno</button>
+      <button id="view-week">Settimana</button>
+    </div>
+
+    <div class="week-control">
+      <button class="nav-btn" id="prev-week" aria-label="Settimana precedente">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <div class="week-display">
+        <span class="week-num" id="week-num">Settimana —</span>
+        <span class="week-range" id="week-range">—</span>
+      </div>
+      <button class="nav-btn" id="next-week" aria-label="Settimana successiva">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </button>
+      <button id="today-btn" class="nav-btn" title="Vai a oggi" style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.06em;width:auto;padding:0 10px;">Oggi</button>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-ghost" id="sync-btn" title="Sincronizzazione">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        Sync
+      </button>
+      <button class="btn btn-ghost" id="duplicate-btn" title="Duplica dalla settimana precedente">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Duplica
+      </button>
+      <button class="btn btn-ghost" id="export-btn" title="Esporta JSON">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export
+      </button>
+      <button class="btn btn-ghost" id="import-btn" title="Importa JSON">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Import
+      </button>
+      <button class="btn btn-primary" id="print-btn" title="Stampa PDF">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Stampa
+      </button>
+    </div>
+
+    <button class="menu-trigger" id="menu-trigger" aria-label="Menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+    </button>
+  </div>
+</header>
+
+<main class="main" id="main-area">
+  <div id="day-view-container">
+    <div class="day-tabs" id="day-tabs"></div>
+    <div id="day-view"></div>
+  </div>
+  <div id="week-view-container" style="display:none;"></div>
+</main>
+
+<div id="print-container"></div>
+
+<!-- Sync modal -->
+<div class="modal-overlay" id="modal-sync">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Sincronizzazione</span>
+      <button class="btn btn-icon btn-ghost" data-close-modal aria-label="Chiudi">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div id="sync-warning-host"></div>
+
+      <div class="sync-info">
+        <div class="sync-info-row">
+          <span class="sync-info-label">Stato</span>
+          <span class="sync-info-value" id="sync-info-state">—</span>
+        </div>
+        <div class="sync-info-row">
+          <span class="sync-info-label">Ultimo caricamento</span>
+          <span class="sync-info-value muted" id="sync-info-pull">—</span>
+        </div>
+        <div class="sync-info-row">
+          <span class="sync-info-label">Ultimo salvataggio</span>
+          <span class="sync-info-value muted" id="sync-info-push">—</span>
+        </div>
+        <div class="sync-info-row">
+          <span class="sync-info-label">Ultima modifica remota</span>
+          <span class="sync-info-value muted" id="sync-info-remote">—</span>
+        </div>
+      </div>
+
+      <div class="sync-actions">
+        <button class="sync-action-btn primary" id="sync-push-btn">
+          <span class="sa-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </span>
+          <span class="sa-text">
+            <span class="sa-title">Salva su cloud</span>
+            <span class="sa-desc">Pubblica le modifiche locali</span>
+          </span>
+        </button>
+        <button class="sync-action-btn" id="sync-pull-btn">
+          <span class="sa-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </span>
+          <span class="sa-text">
+            <span class="sa-title">Carica da cloud</span>
+            <span class="sa-desc">Sovrascrive il locale con i dati remoti</span>
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Import modal -->
+<div class="modal-overlay" id="modal-import">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Importa turni</span>
+      <button class="btn btn-icon btn-ghost" data-close-modal aria-label="Chiudi">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label class="field-label">Incolla il JSON esportato</label>
+        <textarea class="field-input" id="import-textarea" placeholder='{"weeks": {...}}'></textarea>
+        <div class="field-help">Sostituisce o unisce i dati esistenti con quelli importati.</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" data-close-modal>Annulla</button>
+      <button class="btn btn-ghost" id="import-merge-btn">Unisci</button>
+      <button class="btn btn-primary" id="import-replace-btn">Sostituisci</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom sheet: Status -->
+<div class="sheet-overlay" id="sheet-status-overlay"></div>
+<div class="sheet" id="sheet-status" role="dialog" aria-label="Seleziona stato">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header"><span class="sheet-title">Stato turno</span></div>
+  <div class="sheet-body" id="sheet-status-body"></div>
+</div>
+
+<!-- Bottom sheet: Mobile menu -->
+<div class="sheet-overlay" id="sheet-menu-overlay"></div>
+<div class="sheet" id="sheet-menu" role="dialog" aria-label="Menu azioni">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header"><span class="sheet-title">Azioni</span></div>
+  <div class="sheet-body">
+    <button class="sheet-option" data-action="sync">
+      <svg class="sheet-option-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+      Sincronizzazione
+    </button>
+    <button class="sheet-option" data-action="duplicate">
+      <svg class="sheet-option-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      Duplica settimana precedente
+    </button>
+    <button class="sheet-option" data-action="print">
+      <svg class="sheet-option-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      Stampa PDF
+    </button>
+    <button class="sheet-option" data-action="export">
+      <svg class="sheet-option-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Esporta dati (JSON)
+    </button>
+    <button class="sheet-option" data-action="import">
+      <svg class="sheet-option-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Importa dati (JSON)
+    </button>
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <span class="toast-dot"></span>
+  <span class="toast-msg">—</span>
+</div>
+
+<script>
+/* =========================================================
+   CONFIG
+   ========================================================= */
+const ROLES = [
+  { id: 'accoglienza', name: 'Accoglienza', baseSlots: 2 },
+  { id: 'cassa',       name: 'Cassa',       baseSlots: 2 },
+  { id: 'sala',        name: 'Sala',        baseSlots: 8 },
+  { id: 'barman',      name: 'Barman',      baseSlots: 4 },
+  { id: 'barback',     name: 'Barback',     baseSlots: 1 },
+  { id: 'cucina',      name: 'Cucina',      baseSlots: 4 },
+  { id: 'lavaggio',    name: 'Lavaggio',    baseSlots: 2 },
+  { id: 'bagni',       name: 'Bagni',       baseSlots: 1 },
+];
+
+const STATUSES = [
+  { id: 'confirmed',  label: 'Confermato', short: 'OK',   cls: 's-confirmed'  },
+  { id: 'pending',    label: 'In attesa',  short: 'PEND', cls: 's-pending'    },
+  { id: 'substitute', label: 'Sostituto',  short: 'SOST', cls: 's-substitute' },
+  { id: 'cancelled',  label: 'Annullato',  short: 'X',    cls: 's-cancelled'  },
+];
+const STATUS_BY_ID = Object.fromEntries(STATUSES.map(s => [s.id, s]));
+
+const DAYS = [
+  { id: 'mon', name: 'Lunedì',    short: 'Lun', dayOffset: 0, defaultOpen: false },
+  { id: 'tue', name: 'Martedì',   short: 'Mar', dayOffset: 1, defaultOpen: true  },
+  { id: 'wed', name: 'Mercoledì', short: 'Mer', dayOffset: 2, defaultOpen: true  },
+  { id: 'thu', name: 'Giovedì',   short: 'Gio', dayOffset: 3, defaultOpen: true  },
+  { id: 'fri', name: 'Venerdì',   short: 'Ven', dayOffset: 4, defaultOpen: true  },
+  { id: 'sat', name: 'Sabato',    short: 'Sab', dayOffset: 5, defaultOpen: true  },
+  { id: 'sun', name: 'Domenica',  short: 'Dom', dayOffset: 6, defaultOpen: false },
+];
+
+const STORAGE_KEY = 'nimbus_turni_v2';
+const SYNC_META_KEY = 'nimbus_turni_v2_meta';
+
+/* =========================================================
+   SUPABASE CONFIG
+   ========================================================= */
+const SUPABASE_URL = 'https://wfnxttoypfzvyfflbgtd.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indmbnh0dG95cGZ6dnlmZmxiZ3RkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwMDY0NDQsImV4cCI6MjA5MzU4MjQ0NH0.yD0D9HRMf2PpsOxp4hnq30LyTBnwz9Wjz8hblGIf7bs';
+const SYNC_TABLE = 'nimbus_data';
+const SYNC_KEY = 'turni';
+
+/* =========================================================
+   STATE
+   ========================================================= */
+let state = { weeks: {} };
+let currentWeekKey = null;
+let currentDayId = null;
+let currentView = 'day';
+let activeStatusContext = null;
+
+function emptySlot() { return { name: '', status: 'pending', doc: false, hire: false }; }
+
+/* =========================================================
+   SYNC STATE
+   ========================================================= */
+let syncMeta = {
+  lastPullAt: null,
+  lastPushAt: null,
+  remoteUpdatedAt: null,
+  dirty: false,
+};
+let pushTimer = null;
+let pushInFlight = false;
+let pushAgainAfter = false;
+let conflictDetected = false;
+
+function loadSyncMeta() {
+  try {
+    const raw = localStorage.getItem(SYNC_META_KEY);
+    if (raw) syncMeta = { ...syncMeta, ...JSON.parse(raw) };
+  } catch (e) { /* ignore */ }
+}
+function saveSyncMeta() {
+  try { localStorage.setItem(SYNC_META_KEY, JSON.stringify(syncMeta)); }
+  catch (e) { /* ignore */ }
+}
+function markDirty() {
+  syncMeta.dirty = true;
+  saveSyncMeta();
+  schedulePush();
+}
+function markClean(remoteUpdatedAt) {
+  syncMeta.dirty = false;
+  if (remoteUpdatedAt) syncMeta.remoteUpdatedAt = remoteUpdatedAt;
+  saveSyncMeta();
+}
+
+function schedulePush() {
+  if (conflictDetected) return; // sync sospeso fino a risoluzione manuale
+  if (!navigator.onLine) return;
+  clearTimeout(pushTimer);
+  pushTimer = setTimeout(() => {
+    if (pushInFlight) {
+      pushAgainAfter = true;
+      return;
+    }
+    autoPush();
+  }, 1000);
+}
+
+async function autoPush() {
+  if (pushInFlight) { pushAgainAfter = true; return; }
+  if (!navigator.onLine) return;
+  if (!syncMeta.dirty) return;
+  pushInFlight = true;
+  try {
+    // Conflict check
+    const rows = await supabaseRequest('GET', `${SYNC_TABLE}?key=eq.${SYNC_KEY}&select=updated_at`);
+    if (rows && rows.length > 0) {
+      const remoteAt = rows[0].updated_at;
+      if (syncMeta.remoteUpdatedAt && remoteAt !== syncMeta.remoteUpdatedAt) {
+        conflictDetected = true;
+        showToast('⚠ Conflitto rilevato — apri Sync per risolvere', 'error');
+        pushInFlight = false;
+        return;
+      }
+    }
+    const updated = await supabaseRequest(
+      'PATCH',
+      `${SYNC_TABLE}?key=eq.${SYNC_KEY}`,
+      { data: { weeks: state.weeks }, updated_at: new Date().toISOString() }
+    );
+    let remoteAt;
+    if (updated && updated.length > 0) {
+      remoteAt = updated[0].updated_at;
+    } else {
+      await supabaseRequest('POST', SYNC_TABLE, { key: SYNC_KEY, data: { weeks: state.weeks } });
+      const fresh = await supabaseRequest('GET', `${SYNC_TABLE}?key=eq.${SYNC_KEY}&select=updated_at`);
+      remoteAt = fresh && fresh[0] ? fresh[0].updated_at : new Date().toISOString();
+    }
+    syncMeta.lastPushAt = new Date().toISOString();
+    markClean(remoteAt);
+  } catch (e) {
+    console.error('Auto-push failed', e);
+    // Riprova fra 5 secondi se ancora sporco
+    setTimeout(() => { if (syncMeta.dirty) schedulePush(); }, 5000);
+  } finally {
+    pushInFlight = false;
+    if (pushAgainAfter) {
+      pushAgainAfter = false;
+      schedulePush();
+    }
+  }
+}
+
+function fmtRelative(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  const diff = Date.now() - d.getTime();
+  const min = Math.floor(diff / 60000);
+  if (min < 1) return 'adesso';
+  if (min < 60) return `${min} min fa`;
+  const h = Math.floor(min / 60);
+  if (h < 24) return `${h} ${h===1?'ora':'ore'} fa`;
+  const days = Math.floor(h / 24);
+  if (days < 7) return `${days} ${days===1?'giorno':'giorni'} fa`;
+  return d.toLocaleDateString('it-IT', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+}
+
+async function supabaseRequest(method, path, body) {
+  const url = `${SUPABASE_URL}/rest/v1/${path}`;
+  const headers = {
+    'apikey': SUPABASE_ANON_KEY,
+    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+    'Content-Type': 'application/json',
+    'Prefer': 'return=representation',
+  };
+  const opts = { method, headers };
+  if (body !== undefined) opts.body = JSON.stringify(body);
+  const res = await fetch(url, opts);
+  if (!res.ok) {
+    const txt = await res.text().catch(() => '');
+    throw new Error(`Supabase ${res.status}: ${txt || res.statusText}`);
+  }
+  if (res.status === 204) return null;
+  return res.json();
+}
+
+async function pullFromCloud() {
+  try {
+    const rows = await supabaseRequest('GET', `${SYNC_TABLE}?key=eq.${SYNC_KEY}&select=data,updated_at`);
+    if (!rows || rows.length === 0) {
+      await supabaseRequest('POST', SYNC_TABLE, { key: SYNC_KEY, data: { weeks: state.weeks } });
+      const fresh = await supabaseRequest('GET', `${SYNC_TABLE}?key=eq.${SYNC_KEY}&select=updated_at`);
+      const remoteAt = fresh && fresh[0] ? fresh[0].updated_at : new Date().toISOString();
+      syncMeta.lastPullAt = new Date().toISOString();
+      syncMeta.lastPushAt = new Date().toISOString();
+      markClean(remoteAt);
+      conflictDetected = false;
+      showToast('Inizializzato su cloud', 'success');
+      return;
+    }
+    const row = rows[0];
+    const remoteData = row.data;
+    if (!remoteData || !remoteData.weeks) throw new Error('Dati remoti corrotti');
+    state.weeks = remoteData.weeks;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    syncMeta.lastPullAt = new Date().toISOString();
+    markClean(row.updated_at);
+    conflictDetected = false;
+    renderAll();
+    showToast('Caricato da cloud', 'success');
+  } catch (e) {
+    console.error('Pull error', e);
+    showToast('Errore caricamento: ' + e.message, 'error');
+  }
+}
+
+async function pushToCloudManual() {
+  // Push manuale che bypassa il check di conflitto (forza l'overwrite)
+  pushInFlight = true;
+  try {
+    const updated = await supabaseRequest(
+      'PATCH',
+      `${SYNC_TABLE}?key=eq.${SYNC_KEY}`,
+      { data: { weeks: state.weeks }, updated_at: new Date().toISOString() }
+    );
+    let remoteAt;
+    if (updated && updated.length > 0) {
+      remoteAt = updated[0].updated_at;
+    } else {
+      await supabaseRequest('POST', SYNC_TABLE, { key: SYNC_KEY, data: { weeks: state.weeks } });
+      const fresh = await supabaseRequest('GET', `${SYNC_TABLE}?key=eq.${SYNC_KEY}&select=updated_at`);
+      remoteAt = fresh && fresh[0] ? fresh[0].updated_at : new Date().toISOString();
+    }
+    syncMeta.lastPushAt = new Date().toISOString();
+    markClean(remoteAt);
+    conflictDetected = false;
+    showToast('Salvato su cloud', 'success');
+  } catch (e) {
+    console.error('Push error', e);
+    showToast('Errore salvataggio: ' + e.message, 'error');
+  } finally {
+    pushInFlight = false;
+  }
+}
+
+function renderSyncModal() {
+  const stateEl = document.getElementById('sync-info-state');
+  const pullEl = document.getElementById('sync-info-pull');
+  const pushEl = document.getElementById('sync-info-push');
+  const remoteEl = document.getElementById('sync-info-remote');
+  const warnHost = document.getElementById('sync-warning-host');
+
+  if (!navigator.onLine) {
+    stateEl.textContent = 'Offline';
+    stateEl.className = 'sync-info-value error';
+  } else if (conflictDetected) {
+    stateEl.textContent = 'Conflitto rilevato';
+    stateEl.className = 'sync-info-value error';
+  } else if (syncMeta.dirty) {
+    stateEl.textContent = 'Sincronizzazione in corso…';
+    stateEl.className = 'sync-info-value dirty';
+  } else if (syncMeta.lastPushAt || syncMeta.lastPullAt) {
+    stateEl.textContent = 'Sincronizzato';
+    stateEl.className = 'sync-info-value synced';
+  } else {
+    stateEl.textContent = 'Mai sincronizzato';
+    stateEl.className = 'sync-info-value muted';
+  }
+
+  pullEl.textContent = fmtRelative(syncMeta.lastPullAt);
+  pushEl.textContent = fmtRelative(syncMeta.lastPushAt);
+  remoteEl.textContent = fmtRelative(syncMeta.remoteUpdatedAt);
+
+  warnHost.innerHTML = '';
+  if (conflictDetected) {
+    warnHost.innerHTML = `
+      <div class="sync-warning">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Un altro device ha modificato i dati dopo il tuo ultimo caricamento. Scegli: <b>Salva su cloud</b> per sovrascrivere le modifiche remote, oppure <b>Carica da cloud</b> per scartare le modifiche locali.
+      </div>
+    `;
+  } else if (!navigator.onLine) {
+    warnHost.innerHTML = `
+      <div class="sync-warning">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.58 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+        Sei offline. Le modifiche restano salvate localmente e si sincronizzeranno appena torni online.
+      </div>
+    `;
+  }
+}
+
+/* =========================================================
+   DATE HELPERS
+   ========================================================= */
+function getISOWeek(date) {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  const weekNum = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+  return { year: d.getUTCFullYear(), week: weekNum };
+}
+function weekKey(date) {
+  const { year, week } = getISOWeek(date);
+  return `${year}-W${String(week).padStart(2, '0')}`;
+}
+function dateForDay(monday, offset) {
+  const d = new Date(monday);
+  d.setDate(d.getDate() + offset);
+  return d;
+}
+function fmtDate(date, opts = { day: '2-digit', month: 'short' }) {
+  return date.toLocaleDateString('it-IT', opts);
+}
+function fmtRange(monday) {
+  const sunday = dateForDay(monday, 6);
+  const sameMonth = monday.getMonth() === sunday.getMonth();
+  if (sameMonth) {
+    return `${monday.getDate()}–${sunday.getDate()} ${fmtDate(sunday, { month: 'long' })}`;
+  }
+  return `${fmtDate(monday)} – ${fmtDate(sunday)}`;
+}
+function parseWeekKey(key) {
+  const [yearStr, weekStr] = key.split('-W');
+  const year = parseInt(yearStr, 10);
+  const week = parseInt(weekStr, 10);
+  const jan4 = new Date(year, 0, 4);
+  const jan4Day = jan4.getDay() || 7;
+  const week1Monday = new Date(jan4);
+  week1Monday.setDate(jan4.getDate() - jan4Day + 1);
+  const monday = new Date(week1Monday);
+  monday.setDate(week1Monday.getDate() + (week - 1) * 7);
+  monday.setHours(0, 0, 0, 0);
+  return monday;
+}
+
+/* =========================================================
+   PERSISTENCE
+   ========================================================= */
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      state = JSON.parse(raw);
+      if (!state.weeks) state.weeks = {};
+    }
+  } catch (e) {
+    console.error('Load failed', e);
+    state = { weeks: {} };
+  }
+}
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    if (typeof markDirty === 'function') markDirty();
+  } catch (e) {
+    console.error('Save failed', e);
+    showToast('Salvataggio fallito: ' + e.message, 'error');
+  }
+}
+
+/* =========================================================
+   STATE OPERATIONS
+   ========================================================= */
+function ensureWeek(key) {
+  if (!state.weeks[key]) {
+    state.weeks[key] = {};
+    DAYS.forEach(day => {
+      state.weeks[key][day.id] = {
+        open: day.defaultOpen,
+        roles: Object.fromEntries(
+          ROLES.map(r => [r.id, Array.from({ length: r.baseSlots }, () => emptySlot())])
+        )
+      };
+    });
+  } else {
+    DAYS.forEach(day => {
+      if (!state.weeks[key][day.id]) {
+        state.weeks[key][day.id] = {
+          open: day.defaultOpen,
+          roles: Object.fromEntries(
+            ROLES.map(r => [r.id, Array.from({ length: r.baseSlots }, () => emptySlot())])
+          )
+        };
+      }
+      ROLES.forEach(role => {
+        if (!state.weeks[key][day.id].roles[role.id]) {
+          state.weeks[key][day.id].roles[role.id] = Array.from({ length: role.baseSlots }, () => emptySlot());
+        }
+        state.weeks[key][day.id].roles[role.id] = state.weeks[key][day.id].roles[role.id].map(s => {
+          if (typeof s === 'string') return { name: s, status: 'pending', doc: false, hire: false };
+          return { name: s.name || '', status: s.status || 'pending', doc: !!s.doc, hire: !!s.hire };
+        });
+      });
+    });
+  }
+  return state.weeks[key];
+}
+function getDay(weekKey, dayId) { return ensureWeek(weekKey)[dayId]; }
+function countFilled(weekKey, dayId) {
+  const day = getDay(weekKey, dayId);
+  let n = 0;
+  Object.values(day.roles).forEach(slots => {
+    slots.forEach(s => { if (s.name && s.name.trim() && s.status !== 'cancelled') n++; });
+  });
+  return n;
+}
+function countTotalSlots(weekKey, dayId) {
+  const day = getDay(weekKey, dayId);
+  let n = 0;
+  Object.values(day.roles).forEach(slots => { n += slots.length; });
+  return n;
+}
+
+/* =========================================================
+   RENDER: WEEK HEADER
+   ========================================================= */
+function renderWeekHeader() {
+  const monday = parseWeekKey(currentWeekKey);
+  const { year, week } = getISOWeek(monday);
+  document.getElementById('week-num').textContent = `Sett. ${week} · ${year}`;
+  document.getElementById('week-range').textContent = fmtRange(monday);
+}
+
+/* =========================================================
+   RENDER: DAY TABS
+   ========================================================= */
+function renderDayTabs() {
+  const monday = parseWeekKey(currentWeekKey);
+  const tabs = document.getElementById('day-tabs');
+  tabs.innerHTML = '';
+  DAYS.forEach(day => {
+    const date = dateForDay(monday, day.dayOffset);
+    const dayState = getDay(currentWeekKey, day.id);
+    const filled = countFilled(currentWeekKey, day.id);
+    const tab = document.createElement('button');
+    tab.className = 'day-tab' + (day.id === currentDayId ? ' active' : '') + (!dayState.open ? ' disabled' : '');
+    tab.innerHTML = `
+      <span class="day-name">${day.short}</span>
+      <span class="day-date">${fmtDate(date)}</span>
+      ${dayState.open && filled > 0 ? `<span class="day-count">${filled}</span>` : ''}
+    `;
+    tab.addEventListener('click', () => {
+      currentDayId = day.id;
+      renderDayTabs();
+      renderDayView();
+      // Scroll active tab into view on mobile
+      requestAnimationFrame(() => {
+        const active = tabs.querySelector('.day-tab.active');
+        if (active) active.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      });
+    });
+    tabs.appendChild(tab);
+  });
+  // Auto-scroll to active on initial render
+  requestAnimationFrame(() => {
+    const active = tabs.querySelector('.day-tab.active');
+    if (active) active.scrollIntoView({ block: 'nearest', inline: 'center' });
+  });
+}
+
+/* =========================================================
+   RENDER: DAY VIEW
+   ========================================================= */
+function renderDayView() {
+  const monday = parseWeekKey(currentWeekKey);
+  const day = DAYS.find(d => d.id === currentDayId);
+  const date = dateForDay(monday, day.dayOffset);
+  const dayState = getDay(currentWeekKey, currentDayId);
+
+  const view = document.getElementById('day-view');
+  const filled = countFilled(currentWeekKey, currentDayId);
+  const total = countTotalSlots(currentWeekKey, currentDayId);
+
+  let html = `
+    <div class="day-header">
+      <h1 class="day-title">${day.name}<span class="day-title-sub">${fmtDate(date, { day: 'numeric', month: 'long', year: 'numeric' })}</span></h1>
+      <div class="day-meta">
+        <div class="meta-stat">
+          <span class="meta-stat-label">Personale</span>
+          <span class="meta-stat-value">${filled}<span style="color:var(--text-faint);font-weight:400">/${total}</span></span>
+        </div>
+        <button class="day-toggle ${dayState.open ? '' : 'closed'}" id="toggle-day">
+          <span class="toggle-dot"></span>
+          ${dayState.open ? 'Aperto' : 'Chiuso'}
+        </button>
+      </div>
+    </div>
+    <div class="day-content">
+  `;
+
+  if (!dayState.open) {
+    html += `
+      <div class="day-closed-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+        <h3>Locale chiuso</h3>
+        <p>Non ci sono turni programmati per questa giornata.</p>
+      </div>
+    </div>
+    `;
+  } else {
+    html += `<div class="roles-grid">`;
+    ROLES.forEach(role => {
+      const slots = dayState.roles[role.id];
+      const filledRole = slots.filter(s => s.name && s.name.trim() && s.status !== 'cancelled').length;
+      html += `
+        <div class="role-card" data-role="${role.id}">
+          <div class="role-header">
+            <span class="role-name">${role.name}</span>
+            <span class="role-count">${filledRole}/${slots.length}</span>
+          </div>
+          <div class="role-slots">
+            ${slots.map((slot, i) => {
+              const status = STATUS_BY_ID[slot.status] || STATUS_BY_ID.pending;
+              const filledClass = slot.name && slot.name.trim() ? 'filled' : '';
+              return `
+                <div class="slot ${filledClass}">
+                  <span class="slot-num">${i + 1}</span>
+                  <div class="slot-main">
+                    <input type="text" class="slot-input" data-role="${role.id}" data-idx="${i}" data-field="name" value="${escapeAttr(slot.name)}" placeholder="Nome…" autocomplete="off" enterkeyhint="next">
+                    <div class="slot-meta">
+                      <button class="status-trigger ${status.cls}" data-role="${role.id}" data-idx="${i}">
+                        ${status.label}
+                        <svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>
+                      </button>
+                      <button class="check-pill ${slot.doc ? 'on' : ''}" data-role="${role.id}" data-idx="${i}" data-field="doc" title="Documento ricevuto">
+                        <span class="check-mark"></span>Doc
+                      </button>
+                      <button class="check-pill ${slot.hire ? 'on' : ''}" data-role="${role.id}" data-idx="${i}" data-field="hire" title="Assunzione completata">
+                        <span class="check-mark"></span>Ass.
+                      </button>
+                    </div>
+                  </div>
+                  <button class="slot-remove" data-role="${role.id}" data-idx="${i}" title="Rimuovi slot" aria-label="Rimuovi slot">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  </button>
+                </div>
+              `;
+            }).join('')}
+          </div>
+          <div class="role-footer">
+            <button class="add-slot" data-role="${role.id}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Aggiungi slot
+            </button>
+          </div>
+        </div>
+      `;
+    });
+    html += `</div></div>`;
+  }
+
+  view.innerHTML = html;
+  wireDayView(dayState);
+}
+
+function wireDayView(dayState) {
+  const view = document.getElementById('day-view');
+
+  const toggleBtn = document.getElementById('toggle-day');
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      dayState.open = !dayState.open;
+      saveState();
+      renderDayView();
+      renderDayTabs();
+    });
+  }
+
+  view.querySelectorAll('.slot-input').forEach(input => {
+    input.addEventListener('input', e => {
+      const r = e.target.dataset.role;
+      const i = parseInt(e.target.dataset.idx, 10);
+      dayState.roles[r][i].name = e.target.value;
+      saveState();
+      const slot = e.target.closest('.slot');
+      slot.classList.toggle('filled', !!e.target.value.trim());
+    });
+    input.addEventListener('change', () => {
+      renderRoleCounts();
+      renderDayTabsCounts();
+    });
+  });
+
+  view.querySelectorAll('.status-trigger').forEach(btn => {
+    btn.addEventListener('click', e => {
+      const r = e.currentTarget.dataset.role;
+      const i = parseInt(e.currentTarget.dataset.idx, 10);
+      openStatusSheet(r, i, dayState);
+    });
+  });
+
+  view.querySelectorAll('.check-pill').forEach(pill => {
+    pill.addEventListener('click', e => {
+      const btn = e.currentTarget;
+      const r = btn.dataset.role;
+      const i = parseInt(btn.dataset.idx, 10);
+      const field = btn.dataset.field;
+      dayState.roles[r][i][field] = !dayState.roles[r][i][field];
+      btn.classList.toggle('on', dayState.roles[r][i][field]);
+      saveState();
+    });
+  });
+
+  view.querySelectorAll('.slot-remove').forEach(btn => {
+    btn.addEventListener('click', e => {
+      const r = e.currentTarget.dataset.role;
+      const i = parseInt(e.currentTarget.dataset.idx, 10);
+      dayState.roles[r].splice(i, 1);
+      if (dayState.roles[r].length === 0) dayState.roles[r].push(emptySlot());
+      saveState();
+      renderDayView();
+      renderDayTabs();
+    });
+  });
+
+  view.querySelectorAll('.add-slot').forEach(btn => {
+    btn.addEventListener('click', e => {
+      const r = e.currentTarget.dataset.role;
+      dayState.roles[r].push(emptySlot());
+      saveState();
+      renderDayView();
+      renderDayTabs();
+      requestAnimationFrame(() => {
+        const inputs = view.querySelectorAll(`.slot-input[data-role="${r}"]`);
+        if (inputs.length) inputs[inputs.length - 1].focus();
+      });
+    });
+  });
+}
+
+function renderRoleCounts() {
+  const dayState = getDay(currentWeekKey, currentDayId);
+  document.querySelectorAll('.role-card').forEach(card => {
+    const r = card.dataset.role;
+    const slots = dayState.roles[r];
+    const filled = slots.filter(s => s.name && s.name.trim() && s.status !== 'cancelled').length;
+    card.querySelector('.role-count').textContent = `${filled}/${slots.length}`;
+  });
+  const filled = countFilled(currentWeekKey, currentDayId);
+  const total = countTotalSlots(currentWeekKey, currentDayId);
+  const stat = document.querySelector('.meta-stat-value');
+  if (stat) stat.innerHTML = `${filled}<span style="color:var(--text-faint);font-weight:400">/${total}</span>`;
+}
+
+function renderDayTabsCounts() {
+  document.querySelectorAll('.day-tab').forEach((tab, idx) => {
+    const dayId = DAYS[idx].id;
+    const dayState = getDay(currentWeekKey, dayId);
+    const filled = countFilled(currentWeekKey, dayId);
+    const existingCount = tab.querySelector('.day-count');
+    if (dayState.open && filled > 0) {
+      if (existingCount) existingCount.textContent = filled;
+      else {
+        const span = document.createElement('span');
+        span.className = 'day-count';
+        span.textContent = filled;
+        tab.appendChild(span);
+      }
+    } else if (existingCount) {
+      existingCount.remove();
+    }
+  });
+}
+
+/* =========================================================
+   RENDER: WEEK VIEW
+   ========================================================= */
+function renderWeekView() {
+  const monday = parseWeekKey(currentWeekKey);
+  const container = document.getElementById('week-view-container');
+
+  let totalAssigned = 0, totalSlots = 0;
+  let missingDoc = 0, missingHire = 0, pending = 0;
+  const openDays = DAYS.filter(d => getDay(currentWeekKey, d.id).open);
+  openDays.forEach(d => {
+    totalAssigned += countFilled(currentWeekKey, d.id);
+    totalSlots += countTotalSlots(currentWeekKey, d.id);
+    const dayState = getDay(currentWeekKey, d.id);
+    Object.values(dayState.roles).forEach(slots => {
+      slots.forEach(s => {
+        if (!s.name || !s.name.trim()) return;
+        if (s.status === 'cancelled') return;
+        if (!s.doc) missingDoc++;
+        if (!s.hire) missingHire++;
+        if (s.status === 'pending') pending++;
+      });
+    });
+  });
+
+  let html = `
+    <div class="week-view-header">
+      <h1 class="week-view-title">Vista settimanale<span class="sub">${fmtRange(monday)}</span></h1>
+    </div>
+    <div class="week-summary-bar">
+      <div class="summary-card">
+        <div class="summary-card-label">Serate aperte</div>
+        <div class="summary-card-value">${openDays.length}<span class="sub">/7</span></div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-card-label">Personale</div>
+        <div class="summary-card-value">${totalAssigned}<span class="sub">/${totalSlots}</span></div>
+      </div>
+      <div class="summary-card ${pending>0?'alert':''}">
+        <div class="summary-card-label">In attesa</div>
+        <div class="summary-card-value">${pending}</div>
+      </div>
+      <div class="summary-card ${missingDoc>0?'alert':''}">
+        <div class="summary-card-label">Doc mancanti</div>
+        <div class="summary-card-value">${missingDoc}</div>
+      </div>
+      <div class="summary-card ${missingHire>0?'alert':''}">
+        <div class="summary-card-label">Assunzioni mancanti</div>
+        <div class="summary-card-value">${missingHire}</div>
+      </div>
+    </div>
+
+    <!-- Desktop / tablet matrix table -->
+    <div class="week-table-wrap">
+      <table class="week-table">
+        <thead>
+          <tr>
+            <th>Reparto</th>
+            ${DAYS.map(d => {
+              const date = dateForDay(monday, d.dayOffset);
+              const dayState = getDay(currentWeekKey, d.id);
+              const cnt = countFilled(currentWeekKey, d.id);
+              return `
+                <th class="day-col ${!dayState.open?'closed':''}">
+                  <span class="col-day-name">${d.short}</span>
+                  <span class="col-day-date">${fmtDate(date)}</span>
+                  ${dayState.open && cnt>0 ? `<span class="col-day-count">${cnt}</span>` : ''}
+                </th>
+              `;
+            }).join('')}
+          </tr>
+        </thead>
+        <tbody>
+          ${ROLES.map(role => `
+            <tr>
+              <td class="role-cell">${role.name}</td>
+              ${DAYS.map(d => {
+                const dayState = getDay(currentWeekKey, d.id);
+                if (!dayState.open) return `<td class="day-cell closed">Chiuso</td>`;
+                const slots = dayState.roles[role.id] || [];
+                const named = slots.filter(s => s.name && s.name.trim());
+                if (named.length === 0) return `<td class="day-cell" style="color:var(--text-faint)">—</td>`;
+                return `<td class="day-cell">${named.map(s => {
+                  const st = STATUS_BY_ID[s.status] || STATUS_BY_ID.pending;
+                  const flagDoc = !s.doc && s.status !== 'cancelled' ? '<span class="flag missing-doc" title="Documento mancante">D</span>' : '';
+                  const flagHire = !s.hire && s.status !== 'cancelled' ? '<span class="flag missing-hire" title="Assunzione non completata">A</span>' : '';
+                  return `
+                    <div class="week-name ${st.cls}" title="${st.label}${!s.doc?' · doc mancante':''}${!s.hire?' · assunzione mancante':''}">
+                      <span class="name-dot ${st.cls}"></span>
+                      <span>${escapeHtml(s.name)}</span>
+                      <span class="flags">${flagDoc}${flagHire}</span>
+                    </div>
+                  `;
+                }).join('')}</td>`;
+              }).join('')}
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Mobile stack view -->
+    <div class="week-stack">
+      ${DAYS.map(d => {
+        const dayState = getDay(currentWeekKey, d.id);
+        const date = dateForDay(monday, d.dayOffset);
+        if (!dayState.open) {
+          return `
+            <div class="week-stack-day closed">
+              <div class="week-stack-day-header closed-header">
+                <div class="week-stack-day-name">${d.name}<span class="date">${fmtDate(date)}</span></div>
+                <div class="week-stack-day-stats"><span class="closed-tag">Chiuso</span></div>
+              </div>
+            </div>
+          `;
+        }
+        const filled = countFilled(currentWeekKey, d.id);
+        const dayHasContent = ROLES.some(r => (dayState.roles[r.id] || []).some(s => s.name && s.name.trim()));
+        return `
+          <div class="week-stack-day">
+            <div class="week-stack-day-header">
+              <div class="week-stack-day-name">${d.name}<span class="date">${fmtDate(date)}</span></div>
+              <div class="week-stack-day-stats">${filled} ${filled===1?'persona':'persone'}</div>
+            </div>
+            ${!dayHasContent ? '<div class="week-stack-day-empty">Nessun nome inserito</div>' : `
+              <div class="week-stack-roles">
+                ${ROLES.map(role => {
+                  const slots = dayState.roles[role.id] || [];
+                  const named = slots.filter(s => s.name && s.name.trim());
+                  if (named.length === 0) return '';
+                  return `
+                    <div class="week-stack-role">
+                      <div class="week-stack-role-name">${role.name}</div>
+                      <div class="week-stack-role-list">
+                        ${named.map(s => {
+                          const st = STATUS_BY_ID[s.status] || STATUS_BY_ID.pending;
+                          const flagDoc = !s.doc && s.status !== 'cancelled' ? '<span class="flag missing-doc">D</span>' : '';
+                          const flagHire = !s.hire && s.status !== 'cancelled' ? '<span class="flag missing-hire">A</span>' : '';
+                          return `
+                            <div class="week-name ${st.cls}">
+                              <span class="name-dot ${st.cls}"></span>
+                              <span>${escapeHtml(s.name)}</span>
+                              <span class="flags">${flagDoc}${flagHire}</span>
+                            </div>
+                          `;
+                        }).join('')}
+                      </div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            `}
+          </div>
+        `;
+      }).join('')}
+    </div>
+
+    <div class="legend">
+      <span class="legend-item"><span class="legend-dot" style="background:var(--success)"></span> Confermato</span>
+      <span class="legend-item"><span class="legend-dot" style="background:var(--warning)"></span> In attesa</span>
+      <span class="legend-item"><span class="legend-dot" style="background:var(--info)"></span> Sostituto</span>
+      <span class="legend-item"><span class="legend-dot" style="background:var(--danger)"></span> Annullato</span>
+      <span class="legend-item"><span class="legend-flag" style="color:var(--danger);border-color:rgba(229,72,77,0.5);background:rgba(229,72,77,0.08)">D</span> Doc mancante</span>
+      <span class="legend-item"><span class="legend-flag" style="color:var(--warning);border-color:rgba(245,165,36,0.5);background:rgba(245,165,36,0.08)">A</span> Ass. mancante</span>
+    </div>
+  `;
+
+  container.innerHTML = html;
+}
+
+/* =========================================================
+   PRINT VIEW
+   ========================================================= */
+function buildPrintView() {
+  const monday = parseWeekKey(currentWeekKey);
+  const { year, week } = getISOWeek(monday);
+  const container = document.getElementById('print-container');
+
+  const printedAt = `${fmtDate(new Date(), { day:'2-digit', month:'short', year:'numeric'})} alle ${new Date().toLocaleTimeString('it-IT', {hour:'2-digit', minute:'2-digit'})}`;
+
+  if (currentView === 'week') {
+    let html = `
+      <div class="print-week-header">
+        <div>
+          <div class="print-week-title">Nimbus — Turni settimana ${week}</div>
+          <div style="font-size:10pt;color:#555;margin-top:1mm">${fmtRange(monday)} · ${year}</div>
+        </div>
+        <div style="font-size:9pt;color:#777">Stampato il ${printedAt}</div>
+      </div>
+      <table class="print-week-table">
+        <thead>
+          <tr>
+            <th style="width:22mm">Reparto</th>
+            ${DAYS.map(d => {
+              const date = dateForDay(monday, d.dayOffset);
+              const dayState = getDay(currentWeekKey, d.id);
+              return `<th class="day-col ${!dayState.open?'day-col-closed':''}">${d.short} ${fmtDate(date,{day:'2-digit',month:'2-digit'})}</th>`;
+            }).join('')}
+          </tr>
+        </thead>
+        <tbody>
+          ${ROLES.map(role => `
+            <tr>
+              <td class="role-cell">${role.name}</td>
+              ${DAYS.map(d => {
+                const dayState = getDay(currentWeekKey, d.id);
+                if (!dayState.open) return `<td class="closed">Chiuso</td>`;
+                const slots = dayState.roles[role.id] || [];
+                const named = slots.filter(s => s.name && s.name.trim());
+                if (named.length === 0) return `<td style="color:#aaa;text-align:center">—</td>`;
+                return `<td>${named.map(s => {
+                  const st = STATUS_BY_ID[s.status] || STATUS_BY_ID.pending;
+                  const flags = [];
+                  if (!s.doc && s.status !== 'cancelled') flags.push('D');
+                  if (!s.hire && s.status !== 'cancelled') flags.push('A');
+                  const flagStr = flags.length ? ` <span class="pflag">[${flags.join('·')}]</span>` : '';
+                  const stTag = s.status !== 'confirmed' ? ` <span style="font-size:7pt;color:#888;text-transform:uppercase">[${st.short}]</span>` : '';
+                  return `<span class="pname ${s.status==='cancelled'?'cancelled':''}">${escapeHtml(s.name)}${stTag}${flagStr}</span>`;
+                }).join('')}</td>`;
+              }).join('')}
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+      <div class="print-week-legend">
+        <span><b>D</b> = documento mancante</span>
+        <span><b>A</b> = assunzione mancante</span>
+        <span><b>[PEND]</b> in attesa · <b>[SOST]</b> sostituto · <b>[X]</b> annullato</span>
+      </div>
+    `;
+    container.innerHTML = html;
+    return;
+  }
+
+  let html = `
+    <div style="margin-bottom:6mm;display:flex;align-items:baseline;justify-content:space-between;border-bottom:2px solid black;padding-bottom:3mm;">
+      <div>
+        <div style="font-family:var(--font-display);font-size:16pt;font-weight:700;color:black">Nimbus — Turni</div>
+        <div style="font-size:10pt;color:#555">Settimana ${week} · ${fmtRange(monday)} · ${year}</div>
+      </div>
+      <div style="font-size:9pt;color:#777">Stampato il ${printedAt}</div>
+    </div>
+  `;
+
+  DAYS.forEach(day => {
+    const dayState = getDay(currentWeekKey, day.id);
+    if (!dayState.open) return;
+    const date = dateForDay(monday, day.dayOffset);
+    const filled = countFilled(currentWeekKey, day.id);
+    const total = countTotalSlots(currentWeekKey, day.id);
+
+    html += `
+      <div class="print-day">
+        <div class="print-day-header">
+          <div class="print-day-title">${day.name} <span style="color:#666;font-weight:400;font-size:13pt">${fmtDate(date, {day:'numeric', month:'long'})}</span></div>
+          <div class="print-day-stats">${filled} di ${total} slot</div>
+        </div>
+        <div class="print-roles">
+          ${ROLES.map(role => {
+            const slots = dayState.roles[role.id];
+            const filledRole = slots.filter(s => s.name && s.name.trim() && s.status !== 'cancelled').length;
+            return `
+              <div class="print-role">
+                <div class="print-role-header">
+                  <span>${role.name}</span>
+                  <span>${filledRole}/${slots.length}</span>
+                </div>
+                <ul class="print-role-list">
+                  ${slots.map((slot, i) => {
+                    const hasName = slot.name && slot.name.trim();
+                    if (!hasName) return `<li><span class="print-role-num">${i+1}.</span><span class="print-role-name empty">—</span><span></span><span></span><span></span></li>`;
+                    const st = STATUS_BY_ID[slot.status] || STATUS_BY_ID.pending;
+                    const stTag = slot.status !== 'confirmed' ? `<span class="print-status">${st.short}</span>` : '<span class="print-status" style="color:#aaa">OK</span>';
+                    const docFlag = (!slot.doc && slot.status !== 'cancelled') ? '<span class="print-flag missing">D</span>' : '<span></span>';
+                    const hireFlag = (!slot.hire && slot.status !== 'cancelled') ? '<span class="print-flag missing">A</span>' : '<span></span>';
+                    const cancelStyle = slot.status === 'cancelled' ? 'text-decoration:line-through;color:#999' : '';
+                    return `<li>
+                      <span class="print-role-num">${i+1}.</span>
+                      <span class="print-role-name" style="${cancelStyle}">${escapeHtml(slot.name)}</span>
+                      ${stTag}
+                      ${docFlag}
+                      ${hireFlag}
+                    </li>`;
+                  }).join('')}
+                </ul>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+}
+
+/* =========================================================
+   STATUS SHEET
+   ========================================================= */
+function openStatusSheet(roleId, slotIdx, dayState) {
+  activeStatusContext = { roleId, slotIdx, dayState };
+  const slot = dayState.roles[roleId][slotIdx];
+  const body = document.getElementById('sheet-status-body');
+  body.innerHTML = STATUSES.map(s => `
+    <button class="sheet-option ${s.cls} ${slot.status === s.id ? 'selected' : ''}" data-status="${s.id}">
+      <span class="opt-dot"></span>
+      ${s.label}
+    </button>
+  `).join('');
+  body.querySelectorAll('.sheet-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      const newStatus = opt.dataset.status;
+      slot.status = newStatus;
+      saveState();
+      closeSheet('sheet-status');
+      renderDayView();
+      renderDayTabsCounts();
+    });
+  });
+  openSheet('sheet-status');
+}
+
+function openSheet(id) {
+  document.getElementById(id).classList.add('open');
+  document.getElementById(id + '-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeSheet(id) {
+  document.getElementById(id).classList.remove('open');
+  document.getElementById(id + '-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+/* =========================================================
+   IMPORT / EXPORT
+   ========================================================= */
+function exportJSON() {
+  const data = {
+    exportedAt: new Date().toISOString(),
+    version: 2,
+    weeks: state.weeks,
+  };
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const stamp = new Date().toISOString().slice(0, 10);
+  a.href = url;
+  a.download = `nimbus-turni-${stamp}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('Export scaricato', 'success');
+}
+function importJSON(jsonStr, mode) {
+  try {
+    const data = JSON.parse(jsonStr);
+    if (!data.weeks || typeof data.weeks !== 'object') throw new Error('Formato non valido: manca "weeks"');
+    if (mode === 'replace') state.weeks = data.weeks;
+    else state.weeks = { ...state.weeks, ...data.weeks };
+    saveState();
+    closeModal('modal-import');
+    document.getElementById('import-textarea').value = '';
+    renderAll();
+    showToast(`Importate ${Object.keys(data.weeks).length} settimane`, 'success');
+  } catch (e) {
+    showToast('Import fallito: ' + e.message, 'error');
+  }
+}
+
+function duplicatePreviousWeek() {
+  const monday = parseWeekKey(currentWeekKey);
+  const prevMonday = new Date(monday);
+  prevMonday.setDate(prevMonday.getDate() - 7);
+  const prevKey = weekKey(prevMonday);
+  if (!state.weeks[prevKey]) {
+    showToast('Settimana precedente vuota: niente da duplicare', 'error');
+    return;
+  }
+  state.weeks[currentWeekKey] = JSON.parse(JSON.stringify(state.weeks[prevKey]));
+  saveState();
+  renderAll();
+  showToast('Turni duplicati dalla settimana precedente', 'success');
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function escapeAttr(s) { return escapeHtml(s); }
+
+function showToast(msg, type) {
+  const toast = document.getElementById('toast');
+  toast.querySelector('.toast-msg').textContent = msg;
+  toast.classList.remove('success', 'error');
+  if (type) toast.classList.add(type);
+  toast.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => toast.classList.remove('show'), 2400);
+}
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function switchView(v) {
+  currentView = v;
+  document.getElementById('view-day').classList.toggle('active', v==='day');
+  document.getElementById('view-week').classList.toggle('active', v==='week');
+  document.getElementById('day-view-container').style.display = v==='day' ? '' : 'none';
+  document.getElementById('week-view-container').style.display = v==='week' ? '' : 'none';
+  if (v === 'week') renderWeekView();
+}
+
+function renderAll() {
+  ensureWeek(currentWeekKey);
+  renderWeekHeader();
+  renderDayTabs();
+  renderDayView();
+  if (currentView === 'week') renderWeekView();
+}
+
+/* =========================================================
+   SWIPE NAVIGATION (mobile only)
+   ========================================================= */
+function initSwipe() {
+  const main = document.getElementById('main-area');
+  let startX = 0, startY = 0, startTime = 0, isSwiping = false;
+
+  main.addEventListener('touchstart', e => {
+    if (e.touches.length !== 1) return;
+    if (window.innerWidth > 760) return;
+    // Don't swipe if starting on an input, button, scrollable area
+    const target = e.target;
+    if (target.closest('input, textarea, button, .day-tabs, .week-table-wrap, .modal, .sheet, select')) {
+      isSwiping = false;
+      return;
+    }
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    startTime = Date.now();
+    isSwiping = true;
+  }, { passive: true });
+
+  main.addEventListener('touchend', e => {
+    if (!isSwiping) return;
+    isSwiping = false;
+    const dx = e.changedTouches[0].clientX - startX;
+    const dy = e.changedTouches[0].clientY - startY;
+    const dt = Date.now() - startTime;
+    if (dt > 500) return;
+    if (Math.abs(dx) < 60) return;
+    if (Math.abs(dy) > Math.abs(dx) * 0.7) return;
+
+    if (dx < 0) document.getElementById('next-week').click();
+    else document.getElementById('prev-week').click();
+  });
+}
+
+/* =========================================================
+   INIT
+   ========================================================= */
+function init() {
+  loadState();
+  loadSyncMeta();
+
+  const today = new Date();
+  currentWeekKey = weekKey(today);
+
+  const todayDayIdx = (today.getDay() + 6) % 7;
+  const todayDay = DAYS[todayDayIdx];
+  ensureWeek(currentWeekKey);
+  if (todayDay && state.weeks[currentWeekKey][todayDay.id].open) {
+    currentDayId = todayDay.id;
+  } else {
+    const firstOpen = DAYS.find(d => state.weeks[currentWeekKey][d.id].open);
+    currentDayId = firstOpen ? firstOpen.id : DAYS[0].id;
+  }
+
+  renderAll();
+
+  // Sync handlers
+  document.getElementById('sync-btn').addEventListener('click', () => {
+    renderSyncModal();
+    openModal('modal-sync');
+  });
+  document.getElementById('sync-push-btn').addEventListener('click', async () => {
+    closeModal('modal-sync');
+    await pushToCloudManual();
+  });
+  document.getElementById('sync-pull-btn').addEventListener('click', async () => {
+    if (syncMeta.dirty && !conflictDetected) {
+      const ok = confirm('Hai modifiche locali non ancora salvate sul cloud. Caricare dal cloud le sovrascrive. Procedere?');
+      if (!ok) return;
+    }
+    closeModal('modal-sync');
+    await pullFromCloud();
+  });
+
+  // Online/offline: quando torni online, prova a pushare se sei dirty
+  window.addEventListener('online', () => {
+    if (syncMeta.dirty && !conflictDetected) schedulePush();
+  });
+
+  // Pull silenzioso all'apertura se non ci sono modifiche locali
+  if (navigator.onLine && !syncMeta.dirty) {
+    setTimeout(() => { pullFromCloud().catch(() => {}); }, 300);
+  }
+
+  // Pull silenzioso quando torni alla scheda dopo essere stato altrove
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && navigator.onLine && !syncMeta.dirty && !conflictDetected) {
+      pullFromCloud().catch(() => {});
+    }
+  });
+
+  // Push pendente quando chiudi la pagina
+  window.addEventListener('beforeunload', () => {
+    if (syncMeta.dirty && navigator.onLine && !conflictDetected) {
+      // Tenta un push sincrono best-effort via sendBeacon
+      try {
+        const url = `${SUPABASE_URL}/rest/v1/${SYNC_TABLE}?key=eq.${SYNC_KEY}`;
+        const body = JSON.stringify({ data: { weeks: state.weeks }, updated_at: new Date().toISOString() });
+        // sendBeacon non supporta PATCH, quindi qui possiamo solo sperare che il timer abbia già fatto fuoco
+      } catch (e) { /* ignore */ }
+    }
+  });
+
+  document.getElementById('view-day').addEventListener('click', () => switchView('day'));
+  document.getElementById('view-week').addEventListener('click', () => switchView('week'));
+
+  document.getElementById('prev-week').addEventListener('click', () => {
+    const monday = parseWeekKey(currentWeekKey);
+    monday.setDate(monday.getDate() - 7);
+    currentWeekKey = weekKey(monday);
+    renderAll();
+  });
+  document.getElementById('next-week').addEventListener('click', () => {
+    const monday = parseWeekKey(currentWeekKey);
+    monday.setDate(monday.getDate() + 7);
+    currentWeekKey = weekKey(monday);
+    renderAll();
+  });
+  document.getElementById('today-btn').addEventListener('click', () => {
+    currentWeekKey = weekKey(new Date());
+    renderAll();
+  });
+
+  document.getElementById('duplicate-btn').addEventListener('click', duplicatePreviousWeek);
+  document.getElementById('export-btn').addEventListener('click', exportJSON);
+  document.getElementById('import-btn').addEventListener('click', () => openModal('modal-import'));
+  document.getElementById('print-btn').addEventListener('click', () => {
+    buildPrintView();
+    requestAnimationFrame(() => window.print());
+  });
+
+  // Mobile menu trigger
+  document.getElementById('menu-trigger').addEventListener('click', () => openSheet('sheet-menu'));
+  document.querySelectorAll('#sheet-menu [data-action]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const action = btn.dataset.action;
+      closeSheet('sheet-menu');
+      setTimeout(() => {
+        if (action === 'sync') { renderSyncModal(); openModal('modal-sync'); }
+        else if (action === 'duplicate') duplicatePreviousWeek();
+        else if (action === 'export') exportJSON();
+        else if (action === 'import') openModal('modal-import');
+        else if (action === 'print') {
+          buildPrintView();
+          requestAnimationFrame(() => window.print());
+        }
+      }, 200);
+    });
+  });
+
+  // Sheet overlays close on tap outside
+  document.getElementById('sheet-status-overlay').addEventListener('click', () => closeSheet('sheet-status'));
+  document.getElementById('sheet-menu-overlay').addEventListener('click', () => closeSheet('sheet-menu'));
+
+  // Sheet swipe-down to close
+  [['sheet-status'],['sheet-menu']].forEach(([id]) => {
+    const sheet = document.getElementById(id);
+    let sy = 0, dy = 0, dragging = false;
+    sheet.addEventListener('touchstart', e => {
+      if (e.target.closest('.sheet-body') && e.target.closest('.sheet-body').scrollTop > 0) return;
+      sy = e.touches[0].clientY;
+      dragging = true;
+      sheet.style.transition = 'none';
+    }, { passive: true });
+    sheet.addEventListener('touchmove', e => {
+      if (!dragging) return;
+      dy = e.touches[0].clientY - sy;
+      if (dy < 0) dy = 0;
+      sheet.style.transform = `translateY(${dy}px)`;
+    }, { passive: true });
+    sheet.addEventListener('touchend', () => {
+      if (!dragging) return;
+      dragging = false;
+      sheet.style.transition = '';
+      if (dy > 80) closeSheet(id);
+      else sheet.style.transform = '';
+      dy = 0;
+    });
+  });
+
+  // Modal
+  document.querySelectorAll('[data-close-modal]').forEach(el => {
+    el.addEventListener('click', () => el.closest('.modal-overlay').classList.remove('open'));
+  });
+  document.getElementById('modal-import').addEventListener('click', e => {
+    if (e.target.id === 'modal-import') closeModal('modal-import');
+  });
+  document.getElementById('import-merge-btn').addEventListener('click', () => {
+    importJSON(document.getElementById('import-textarea').value, 'merge');
+  });
+  document.getElementById('import-replace-btn').addEventListener('click', () => {
+    importJSON(document.getElementById('import-textarea').value, 'replace');
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+    if (e.key === 'ArrowLeft' && (e.metaKey || e.ctrlKey)) {
+      document.getElementById('prev-week').click(); e.preventDefault();
+    } else if (e.key === 'ArrowRight' && (e.metaKey || e.ctrlKey)) {
+      document.getElementById('next-week').click(); e.preventDefault();
+    } else if (e.key === 'p' && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+      document.getElementById('print-btn').click();
+    } else if (e.key === 'Escape') {
+      ['sheet-status','sheet-menu'].forEach(id => {
+        if (document.getElementById(id).classList.contains('open')) closeSheet(id);
+      });
+      document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
+    }
+  });
+
+  initSwipe();
+}
+
+init();
+</script>
+</body>
+</html>
